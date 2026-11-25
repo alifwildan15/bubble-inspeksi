@@ -1,0 +1,1062 @@
+<!doctype html>
+<html lang="id">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover"/>
+<meta name="color-scheme" content="light dark"/>
+<link rel="icon" href="data:,"/>
+<title>Bubble Inspeksi</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/pdf-lib@1.17.1/dist/pdf-lib.min.js"></script>
+<style>
+:root{
+  --bg:#eef1f5; --panel:#ffffff; --panel2:#f8fafc; --line:#dbe2ea; --text:#0f2233; --muted:#64748b; --accent:#0e6b7a; --accent2:#0a5561; --danger:#dc2626; --warn:#d97706; --radius:14px;
+  --shadow:0 10px 30px rgba(15,34,51,.10);
+}
+@media (prefers-color-scheme: dark){
+  :root{ --bg:#0d151c; --panel:#16222d; --panel2:#1b2a38; --line:#2a3f52; --text:#e6eef5; --muted:#9ab0c2; --accent:#2dd4bf; --accent2:#14b8a6; --shadow:0 10px 30px rgba(0,0,0,.35);}
+}
+*{box-sizing:border-box}
+html,body{height:100%}
+body{margin:0;font-family:system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif;background:var(--bg);color:var(--text);line-height:1.45}
+button,[role="button"],select,input,textarea{font:inherit}
+button,select,input[type="text"],input[type="number"]{min-height:40px}
+button{cursor:pointer}
+a{color:var(--accent)}
+.titlebar{background:var(--panel);border-bottom:1px solid var(--line)}
+.titlebar-inner{max-width:1440px;margin:0 auto;padding:10px 16px 2px;display:flex;gap:12px;align-items:center;flex-wrap:wrap}
+.tabs{max-width:1440px;margin:0 auto;padding:6px 16px 0;display:flex;gap:2px;flex-wrap:wrap}
+.tab{border:0;background:transparent;padding:8px 16px;font-weight:600;color:var(--muted);border-radius:8px 8px 0 0;min-height:38px;border-bottom:3px solid transparent}
+.tab:hover{color:var(--text);background:var(--panel2)}
+.tab.active{color:var(--accent);border-bottom-color:var(--accent)}
+.ribbon{max-width:1440px;margin:0 auto;padding:0 16px 12px}
+.ribbon-panel{display:none;background:var(--panel2);border:1px solid var(--line);border-radius:12px;padding:10px 12px 6px;flex-wrap:wrap;gap:4px;align-items:stretch}
+.ribbon-panel.active{display:flex}
+.rgroup{display:flex;flex-direction:column;min-width:0}
+.rgroup-body{display:flex;gap:12px;align-items:flex-end;flex:1;padding:2px 4px}
+.rgroup-body.rbtns{flex-direction:column;align-items:stretch;gap:6px;justify-content:center}
+.rgroup-label{text-align:center;font-size:11px;color:var(--muted);font-weight:700;letter-spacing:.05em;text-transform:uppercase;border-top:1px solid var(--line);padding-top:5px;margin-top:6px}
+.rsep{width:1px;background:var(--line);margin:2px 6px}
+.rbig{display:flex;flex-direction:column;align-items:center;gap:4px;border:1px solid transparent;background:transparent;border-radius:10px;padding:8px 14px;font-weight:600;font-size:13px;color:var(--text);cursor:pointer;min-height:64px;justify-content:center;text-align:center;line-height:1.25}
+.rbig:hover{background:var(--panel);border-color:var(--line)}
+.rbig:disabled{opacity:.5;cursor:not-allowed}
+.rbig .ricon{font-size:22px;line-height:1}
+.rnote{align-self:center;font-size:12px;color:var(--muted);max-width:230px;padding:0 8px}
+.colorrow{display:flex;gap:8px;align-items:center}
+.swatches{display:flex;gap:4px;flex-wrap:wrap}
+.swatches button{width:20px;height:20px;min-height:20px;border-radius:50%;border:2px solid #fff;box-shadow:0 0 0 1px var(--line),0 1px 3px rgba(0,0,0,.2);padding:0;cursor:pointer}
+.field input[type="color"]{width:46px;height:38px;padding:2px;cursor:pointer}
+.sizerow{display:flex;justify-content:space-between;font-size:11px;color:var(--muted)}
+.brand{display:flex;align-items:center;gap:12px;min-width:0}
+.brand-mark{width:44px;height:44px;border-radius:50%;border:3px solid var(--danger);display:grid;place-items:center;font-weight:800;color:var(--danger);background:#fff;flex:0 0 auto;font-size:18px}
+@media(prefers-color-scheme:dark){.brand-mark{background:#fff}}
+.brand h1{font-size:20px;line-height:1;margin:0;letter-spacing:-.02em}
+.brand p{margin:2px 0 0;color:var(--muted);font-size:13px}
+.top-actions{margin-left:auto;display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.btn{border:1px solid var(--line);background:var(--panel);color:var(--text);padding:8px 14px;border-radius:999px;font-weight:600;display:inline-flex;align-items:center;gap:8px;justify-content:center}
+.btn:hover{border-color:var(--accent)}
+.btn.primary{background:var(--accent);color:#fff;border-color:var(--accent)}
+.btn.primary:hover{background:var(--accent2)}
+.btn.danger{color:var(--danger);border-color:#fecaca}
+.btn:disabled{opacity:.5;cursor:not-allowed}
+.btn.small{padding:6px 10px;min-height:36px;font-size:13px}
+.field{display:flex;flex-direction:column;gap:4px}
+.field label{font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);font-weight:700}
+.field input,.field select{border:1px solid var(--line);background:var(--panel2);color:var(--text);border-radius:10px;padding:8px 10px}
+.field input[type="range"]{min-height:28px;padding:0}
+.segment{display:flex;background:var(--panel2);border:1px solid var(--line);border-radius:999px;padding:3px;gap:3px}
+.segment button{border:0;background:transparent;padding:7px 12px;border-radius:999px;font-weight:600;color:var(--muted);min-height:36px}
+.segment button.active{background:var(--text);color:var(--panel)}
+.layout{max-width:1440px;margin:12px auto 28px;padding:0 16px;display:grid;grid-template-columns:minmax(0,1fr) 380px;gap:14px;align-items:start}
+@media(max-width:980px){.layout{grid-template-columns:1fr}}
+.canvas-panel{background:var(--panel);border:1px solid var(--line);border-radius:var(--radius);box-shadow:var(--shadow);overflow:hidden}
+.canvas-head{padding:12px 14px;border-bottom:1px solid var(--line);display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+.canvas-head strong{font-size:14px}
+.pager{display:flex;align-items:center;gap:6px;margin-left:auto}
+.pager button{width:40px;height:40px;border-radius:50%;border:1px solid var(--line);background:var(--panel);font-size:18px;line-height:1}
+.pager span{font-size:13px;color:var(--muted);min-width:92px;text-align:center}
+.viewport{padding:16px;background:repeating-conic-gradient(#e8edf2 0% 25%, #f3f6f9 0% 50%) 50% / 22px 22px;overflow:auto;max-height:78vh;overscroll-behavior:contain}
+.viewport-wrap{position:relative}
+.viewport.panning{cursor:grabbing!important}
+.viewport.panning *{cursor:grabbing!important}
+.zoom-float{position:absolute;right:14px;bottom:14px;z-index:6;display:flex;align-items:center;gap:4px;background:var(--panel);border:1px solid var(--line);border-radius:999px;box-shadow:var(--shadow);padding:4px}
+.zoom-float button{min-width:38px;height:38px;border-radius:999px;border:0;background:transparent;color:var(--text);font-weight:700;font-size:16px;padding:0 8px;cursor:pointer}
+.zoom-float button:hover{background:var(--panel2)}
+.zoom-float .zlabel{min-width:58px;font-size:13px}
+@media(prefers-color-scheme:dark){.viewport{background:#0f1b26}}
+.dropzone{border:2px dashed #94a3b8;border-radius:16px;background:var(--panel);padding:36px 20px;text-align:center}
+.dropzone.drag{border-color:var(--accent);background:var(--panel2)}
+.dropzone h2{margin:0 0 6px;font-size:20px}
+.dropzone p{color:var(--muted);margin:0 auto 16px;max-width:520px;font-size:14px}
+.dropzone .big{font-size:42px;line-height:1;margin-bottom:10px}
+.stage{position:relative;margin:0 auto;width:fit-content;box-shadow:0 12px 34px rgba(0,0,0,.22);background:#fff;line-height:0;touch-action:pan-x pan-y}
+.stage canvas{display:block;max-width:none;height:auto}
+.overlay{position:absolute;inset:0;line-height:normal}
+.overlay.add-mode{cursor:crosshair}
+.bubble{position:absolute;transform:translate(-50%,-50%);border-radius:50%;background:rgba(255,255,255,.6);border:2.6px solid var(--bc,#dc2626);color:var(--bc,#dc2626);display:grid;place-items:center;font-weight:800;user-select:none;touch-action:none;cursor:grab;box-shadow:0 2px 8px rgba(0,0,0,.25);z-index:2}
+.bubble:active{cursor:grabbing}
+.bubble.selected{color:#fff;z-index:3}
+.bubble.pending{border-style:dashed}
+.bubble .num{pointer-events:none;line-height:1}
+.leader-svg{position:absolute;inset:0;width:100%;height:100%;pointer-events:none;z-index:1}
+.leader-dot{position:absolute;width:22px;height:22px;background:transparent;border:0;transform:translate(-50%,-50%);z-index:2;cursor:move;touch-action:none}
+.hintbar{padding:10px 14px;border-top:1px solid var(--line);font-size:13px;color:var(--muted);display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.hintbar b{color:var(--text)}
+.sidebar{display:flex;flex-direction:column;gap:14px}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:var(--radius);box-shadow:var(--shadow);padding:14px}
+.card h2{font-size:15px;margin:0 0 4px}
+.card p.sub{margin:0 0 12px;color:var(--muted);font-size:13px}
+.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;text-align:center}
+.stat{background:var(--panel2);border:1px solid var(--line);border-radius:12px;padding:10px 6px}
+.stat b{display:block;font-size:20px;line-height:1}
+.stat span{font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.05em;font-weight:700}
+.list{display:flex;flex-direction:column;gap:10px;max-height:560px;overflow:auto;padding-right:2px}
+.empty{border:1px dashed var(--line);border-radius:12px;padding:16px;text-align:center;color:var(--muted);font-size:14px;background:var(--panel2)}
+.item{border:1px solid var(--line);border-radius:12px;padding:10px;background:var(--panel2)}
+.item.selected{border-color:var(--accent);box-shadow:0 0 0 2px color-mix(in srgb, var(--accent) 25%, transparent)}
+.item-head{display:flex;align-items:center;gap:8px;margin-bottom:8px}
+.badge{width:34px;height:34px;border-radius:50%;border:2.4px solid var(--bc,#dc2626);color:var(--bc,#dc2626);background:#fff;display:grid;place-items:center;font-weight:800;flex:0 0 auto;font-size:14px}
+.item-head .meta{font-size:12px;color:var(--muted);line-height:1.2}
+.item-head .meta b{color:var(--text);font-size:13px}
+.iconbtns{margin-left:auto;display:flex;gap:4px}
+.iconbtns button{width:36px;height:36px;border-radius:9px;border:1px solid var(--line);background:var(--panel);display:grid;place-items:center;font-size:15px}
+.item .row{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.item label{font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.04em;display:block;margin-bottom:3px}
+.item input,.item select{width:100%;border:1px solid var(--line);border-radius:9px;padding:7px 9px;background:var(--panel);color:var(--text);min-height:38px}
+.item .fullrow{margin-top:8px}
+.export-note{font-size:13px;color:var(--muted)}
+.toast{position:fixed;left:50%;bottom:18px;transform:translateX(-50%) translateY(20px);background:#0f2233;color:#fff;padding:11px 16px;border-radius:999px;font-size:14px;font-weight:600;opacity:0;pointer-events:none;transition:.25s;z-index:99;max-width:92vw;text-align:center;box-shadow:0 10px 30px rgba(0,0,0,.3)}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+input[type="file"]{display:none}
+.kbd{background:var(--panel2);border:1px solid var(--line);border-bottom-width:2px;border-radius:6px;padding:1px 6px;font-size:12px}
+@media(max-width:560px){
+  .brand p{display:none}
+  .layout{padding:0 10px}.titlebar-inner,.tabs,.ribbon{padding-left:10px;padding-right:10px}
+  .viewport{padding:10px;max-height:62vh}
+  .list{max-height:none}
+}
+@media print{ .titlebar,.sidebar,.hintbar,.canvas-head{display:none!important} .layout{display:block;padding:0} .viewport{overflow:visible;max-height:none} }
+</style>
+</head>
+<body>
+<header class="titlebar">
+  <div class="titlebar-inner">
+    <div class="brand">
+      <div class="brand-mark">1</div>
+      <div>
+        <h1>Bubble Inspeksi</h1>
+        <p>Upload drawing PDF → klik untuk pasang bubble bernomor otomatis / leader garis 2 klik → export PDF.</p>
+      </div>
+    </div>
+    <div class="top-actions">
+      <label class="btn" for="fileInput">📄 Upload PDF</label>
+      <input type="file" id="fileInput" accept="application/pdf,.pdf"/>
+      <button class="btn primary" id="btnExportTop" type="button" disabled>⬇ Export PDF</button>
+    </div>
+  </div>
+  <nav class="tabs" role="tablist" aria-label="Menu alat">
+    <button class="tab" type="button" data-tab="file" role="tab">Berkas</button>
+    <button class="tab active" type="button" data-tab="home" role="tab">Beranda</button>
+    <button class="tab" type="button" data-tab="markup" role="tab">Markup</button>
+    <button class="tab" type="button" data-tab="view" role="tab">Tampilan</button>
+  </nav>
+  <div class="ribbon">
+    <div class="ribbon-panel" data-panel="file">
+      <div class="rgroup">
+        <div class="rgroup-body">
+          <label class="rbig" for="fileInput"><span class="ricon">📄</span><span>Upload<br/>PDF</span></label>
+          <button class="rbig" id="btnExportFile" type="button" disabled><span class="ricon">⬇</span><span>Export<br/>PDF</span></button>
+          <button class="rbig" id="btnSampleInfo" type="button"><span class="ricon">❓</span><span>Cara<br/>pakai</span></button>
+        </div>
+        <div class="rgroup-label">Dokumen</div>
+      </div>
+    </div>
+    <div class="ribbon-panel active" data-panel="home">
+      <div class="rgroup">
+        <div class="rgroup-body">
+          <div class="field">
+            <label>Mode kursor</label>
+            <div class="segment" role="group" aria-label="Mode">
+              <button type="button" id="modeAdd" class="active">＋ Tambah bubble</button>
+              <button type="button" id="modeMove">✥ Geser / pilih</button>
+            </div>
+          </div>
+          <div class="field">
+            <label>Jenis tanda</label>
+            <div class="segment" role="group" aria-label="Jenis tanda">
+              <button type="button" id="placePlain" class="active">● Bubble saja · 1 klik</button>
+              <button type="button" id="placeLeader">╱ Leader garis · 2 klik</button>
+            </div>
+          </div>
+        </div>
+        <div class="rgroup-label">Alat gambar</div>
+      </div>
+      <div class="rsep"></div>
+      <div class="rgroup">
+        <div class="rgroup-body">
+          <div class="field">
+            <label for="startNum">Nomor awal</label>
+            <input id="startNum" type="number" value="1" min="1" max="999" style="width:92px"/>
+          </div>
+          <div class="field">
+            <label for="prefix">Awalan (opsional)</label>
+            <input id="prefix" type="text" placeholder="cth. A-" style="width:92px" maxlength="6"/>
+          </div>
+        </div>
+        <div class="rgroup-label">Penomoran</div>
+      </div>
+      <div class="rsep"></div>
+      <div class="rgroup">
+        <div class="rgroup-body rbtns">
+          <button class="btn small" id="btnUndo" type="button" disabled title="Urungkan aksi terakhir (Ctrl+Z)">↩ Urungkan</button>
+          <button class="btn small" id="btnRedo" type="button" disabled title="Ulangi aksi yang diurungkan (Ctrl+Shift+Z / Ctrl+Y)">↪ Ulangi</button>
+          <button class="btn small danger" id="btnClear" type="button" disabled>Hapus semua bubble</button>
+        </div>
+        <div class="rgroup-label">Riwayat &amp; hapus</div>
+      </div>
+    </div>
+    <div class="ribbon-panel" data-panel="markup">
+      <div class="rgroup">
+        <div class="rgroup-body">
+          <div class="field">
+            <label for="bubbleSize">Ukuran bubble · <span id="sizeVal">34</span>px</label>
+            <input id="bubbleSize" type="range" min="10" max="64" value="34" step="1" style="width:170px"/>
+            <div class="sizerow" style="width:170px"><span>10px · kecil</span><span>64px · besar</span></div>
+          </div>
+        </div>
+        <div class="rgroup-label">Ukuran</div>
+      </div>
+      <div class="rsep"></div>
+      <div class="rgroup">
+        <div class="rgroup-body">
+          <div class="field">
+            <label for="strokeColor">Warna garis (border, leader &amp; angka)</label>
+            <div class="colorrow">
+              <input type="color" id="strokeColor" value="#dc2626"/>
+              <div class="swatches" data-for="strokeColor">
+                <button type="button" data-color="#dc2626" style="background:#dc2626" title="Merah"></button>
+                <button type="button" data-color="#2563eb" style="background:#2563eb" title="Biru"></button>
+                <button type="button" data-color="#059669" style="background:#059669" title="Hijau"></button>
+                <button type="button" data-color="#111827" style="background:#111827" title="Hitam"></button>
+                <button type="button" data-color="#d97706" style="background:#d97706" title="Oranye"></button>
+                <button type="button" data-color="#7c3aed" style="background:#7c3aed" title="Ungu"></button>
+              </div>
+            </div>
+          </div>
+          <div class="field">
+            <label for="strokeOpacity">Opasitas garis · <span id="strokeOpacityVal">100</span>%</label>
+            <input id="strokeOpacity" type="range" min="5" max="100" value="100" step="5" style="width:150px"/>
+          </div>
+        </div>
+        <div class="rgroup-label">Garis</div>
+      </div>
+      <div class="rsep"></div>
+      <div class="rgroup">
+        <div class="rgroup-body">
+          <div class="field">
+            <label for="fillColor">Warna isi bubble</label>
+            <div class="colorrow">
+              <input type="color" id="fillColor" value="#ffffff"/>
+              <div class="swatches" data-for="fillColor">
+                <button type="button" data-color="#ffffff" style="background:#ffffff" title="Putih"></button>
+                <button type="button" data-color="#fef08a" style="background:#fef08a" title="Kuning muda"></button>
+                <button type="button" data-color="#dbeafe" style="background:#dbeafe" title="Biru muda"></button>
+                <button type="button" data-color="#dcfce7" style="background:#dcfce7" title="Hijau muda"></button>
+                <button type="button" data-color="#fee2e2" style="background:#fee2e2" title="Merah muda"></button>
+                <button type="button" data-color="#111827" style="background:#111827" title="Hitam"></button>
+              </div>
+            </div>
+          </div>
+          <div class="field">
+            <label for="fillOpacity">Opasitas isi · <span id="fillOpacityVal">60</span>%</label>
+            <input id="fillOpacity" type="range" min="0" max="100" value="60" step="5" style="width:150px"/>
+          </div>
+        </div>
+        <div class="rgroup-label">Isi</div>
+      </div>
+      <p class="rnote">Pengaturan Markup berlaku untuk bubble baru — dan langsung mengubah bubble yang sedang terpilih.</p>
+    </div>
+    <div class="ribbon-panel" data-panel="view">
+      <div class="rgroup">
+        <div class="rgroup-body">
+          <div class="field">
+            <label for="zoomRange">Zoom PDF</label>
+            <div style="display:flex;gap:6px;align-items:center;flex-wrap:wrap">
+              <button class="btn small" id="zoomOut" type="button" title="Perkecil">−</button>
+              <input id="zoomRange" type="range" min="25" max="400" step="5" value="100" style="width:120px" aria-label="Tingkat zoom PDF"/>
+              <span id="zoomLabel" style="font-weight:700;min-width:48px;text-align:center">100%</span>
+              <button class="btn small" id="zoomIn" type="button" title="Perbesar">＋</button>
+              <select id="zoomPreset" aria-label="Preset zoom" style="min-height:36px;border:1px solid var(--line);background:var(--panel2);color:var(--text);border-radius:10px;padding:6px 8px">
+                <option value="">Preset…</option>
+                <option value="50">50%</option>
+                <option value="75">75%</option>
+                <option value="100">100%</option>
+                <option value="150">150%</option>
+                <option value="200">200%</option>
+                <option value="300">300%</option>
+                <option value="400">400%</option>
+              </select>
+              <button class="btn small" id="zoomFit" type="button">Pas lebar</button>
+            </div>
+          </div>
+        </div>
+        <div class="rgroup-label">Zoom</div>
+      </div>
+    </div>
+  </div>
+</header>
+
+<main class="layout">
+  <section class="canvas-panel" aria-label="Area drawing">
+    <div class="canvas-head">
+      <strong id="docName">Belum ada dokumen</strong>
+      <span id="docMeta" style="color:var(--muted);font-size:13px"></span>
+      <div class="pager">
+        <button id="prevPage" type="button" aria-label="Halaman sebelumnya" disabled>‹</button>
+        <span id="pageLabel">Halaman – / –</span>
+        <button id="nextPage" type="button" aria-label="Halaman berikutnya" disabled>›</button>
+      </div>
+    </div>
+
+    <div class="viewport-wrap">
+    <div class="viewport" id="viewport">
+      <div class="dropzone" id="dropzone">
+        <div class="big">🎈</div>
+        <h2>Tarik &amp; letakkan PDF drawing di sini</h2>
+        <p>Atau klik tombol di bawah. PDF dibuka lokal di browser kamu — tidak diupload ke server. Setelah terbuka, klik di atas gambar untuk memasang bubble bernomor otomatis.</p>
+        <label class="btn primary" for="fileInput">Pilih file PDF</label>
+        <p style="margin-top:14px;font-size:12px">Mendukung PDF multi-halaman • Bubble bisa digeser, diurutkan ulang, dan dihapus — nomor menyesuaikan otomatis.</p>
+      </div>
+
+      <div class="stage" id="stage" hidden>
+        <canvas id="pdfCanvas"></canvas>
+        <div class="overlay add-mode" id="overlay"></div>
+      </div>
+    </div>
+    <div class="zoom-float" id="zoomFloat" title="Zoom PDF — Ctrl + roda mouse atau cubit dua jari juga bisa">
+      <button type="button" id="zfOut" aria-label="Perkecil">−</button>
+      <button type="button" class="zlabel" id="zfLabel" aria-label="Kembali pas lebar">100%</button>
+      <button type="button" id="zfIn" aria-label="Perbesar">＋</button>
+      <button type="button" id="zfFit" style="font-size:12px">Pas lebar</button>
+    </div>
+    </div>
+
+    <div class="hintbar">
+      <span><b>Tambah:</b> mode “Tambah bubble” lalu klik pada dimensi yang mau ditandai.</span>
+      <span><b>Leader:</b> pilih “Leader garis · 2 klik” — klik 1 = posisi bubble, klik 2 = titik yang ditunjuk. Garis lurus saja, tanpa panah dan tanpa bulatan di ujungnya; ujung garis bisa diseret untuk koreksi. <span class="kbd">Esc</span> membatalkan klik ke-1.</span>
+      <span><b>Urungkan:</b> <span class="kbd">Ctrl</span>+<span class="kbd">Z</span> membatalkan aksi terakhir (tambah, hapus, geser, urut ulang, hapus semua) — bisa ditekan berulang. <span class="kbd">Ctrl</span>+<span class="kbd">Shift</span>+<span class="kbd">Z</span> mengulanginya.</span>
+      <span><b>Gaya bubble:</b> di tab <b>Markup</b> — ukuran sampai sekecil 10px, warna garis &amp; warna isi terpisah, plus opasitas garis dan opasitas isi sendiri-sendiri; semuanya ikut tercetak saat export.</span>
+      <span><b>Geser:</b> seret bubble-nya.</span>
+      <span><b>Pilih:</b> klik bubble untuk memilihnya.</span>
+      <span><span class="kbd">Del</span> menghapus bubble terpilih.</span>
+      <span><b>Zoom:</b> tombol +/− melayang di kanan bawah drawing, slider di tab Tampilan, <span class="kbd">Ctrl</span> + roda mouse, atau cubit dua jari pada drawing.</span>
+      <span><b>Geser tampilan:</b> saat PDF diperbesar, seret area kosong pada mode “Geser / pilih”, atau gulir area drawing.</span>
+    </div>
+  </section>
+
+  <aside class="sidebar">
+    <div class="card">
+      <h2>Ringkasan</h2>
+      <p class="sub">Nomor bubble berurutan otomatis mengikuti urutan klik pada drawing.</p>
+      <div class="stats">
+        <div class="stat"><b id="statBubbles">0</b><span>Bubble</span></div>
+        <div class="stat"><b id="statOnPage">0</b><span>Di halaman ini</span></div>
+        <div class="stat"><b id="statPages">–</b><span>Halaman</span></div>
+      </div>
+    </div>
+
+    <div class="card">
+      <h2>Daftar bubble</h2>
+      <p class="sub">Urutkan dengan tombol ↑ ↓ — penomoran di gambar ikut berubah otomatis. Klik item untuk melompat ke bubble-nya.</p>
+      <div class="list" id="bubbleList">
+        <div class="empty">Belum ada bubble.<br/>Upload PDF, lalu klik pada drawing untuk menambah.</div>
+      </div>
+    </div>
+
+    <div class="card">
+      <h2>Export hasil</h2>
+      <p class="export-note">File hasil adalah PDF baru: drawing asli + bubble nomor dan garis leader tercetak di posisinya (vektor, tajam saat di-zoom), dengan isi bubble sesuai opasitas yang dipilih dan ukuran bubble sama persis seperti yang terlihat di layar — mengubah slider ukuran langsung mengubah hasil export. File asli tidak diubah.</p>
+      <button class="btn primary" id="btnExport" type="button" disabled style="width:100%;margin-top:10px">⬇ Export ke PDF</button>
+      <p class="export-note" id="exportStatus" style="margin-top:8px"></p>
+    </div>
+  </aside>
+</main>
+
+<div class="toast" id="toast" role="status"></div>
+
+<script>
+(function(){
+  "use strict";
+  if(window.pdfjsLib){ pdfjsLib.GlobalWorkerOptions.workerSrc = "https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js"; }
+
+  var $ = function(id){ return document.getElementById(id); };
+  var fileInput=$("fileInput"), dropzone=$("dropzone"), viewport=$("viewport"), stage=$("stage"), canvas=$("pdfCanvas"), overlay=$("overlay");
+  var ctx = canvas.getContext("2d");
+
+  var state = {
+    pdfDoc:null, pdfBytes:null, fileName:"", numPages:0, page:1,
+    scale:1, fitScale:1, mode:"add", placeType:"plain",
+    pendingLeaderId:null, preview:null,
+    bubbles:[], selectedId:null, nextId:1,
+    undoStack:[], redoStack:[], pendingSnap:null,
+    renderTask:null, pendingAnchor:null, pinching:false, gestureBubbleId:null, gestureTime:0
+  };
+
+  /* ---------- Riwayat undo / redo (Ctrl+Z) ---------- */
+  function snapshotState(){
+    return JSON.stringify({ bubbles:state.bubbles, selectedId:state.selectedId, nextId:state.nextId, pendingLeaderId:state.pendingLeaderId });
+  }
+  function pushHistory(snap){
+    state.undoStack.push(typeof snap==="string" ? snap : snapshotState());
+    if(state.undoStack.length>80) state.undoStack.shift();
+    state.redoStack=[];
+    updateActionStates();
+  }
+  function restoreSnapshot(s){
+    try{
+      var o=JSON.parse(s);
+      state.bubbles=o.bubbles||[]; state.selectedId=(o.selectedId!=null?o.selectedId:null);
+      state.nextId=o.nextId||(state.bubbles.length+1);
+      state.pendingLeaderId=(o.pendingLeaderId!=null?o.pendingLeaderId:null);
+    }catch(e){}
+    state.preview=null; state.pendingSnap=null;
+    if(state.pendingLeaderId!=null){
+      var pb=state.bubbles.find(function(z){return z.id===state.pendingLeaderId});
+      if(pb) state.preview={x:pb.x,y:pb.y};
+    }
+    updateAll();
+  }
+  function undoHistory(){
+    if(state.pendingLeaderId!=null){ cancelPending(true); updateAll(); toast("Leader dibatalkan."); return; }
+    if(!state.undoStack.length){ toast("Tidak ada aksi yang bisa diurungkan."); return; }
+    state.redoStack.push(snapshotState());
+    restoreSnapshot(state.undoStack.pop());
+    updateActionStates();
+    toast("Aksi terakhir diurungkan.");
+  }
+  function redoHistory(){
+    if(!state.redoStack.length){ toast("Tidak ada aksi yang bisa diulangi."); return; }
+    state.undoStack.push(snapshotState());
+    restoreSnapshot(state.redoStack.pop());
+    updateActionStates();
+    toast("Aksi diulangi.");
+  }
+
+  function toast(msg){
+    var t=$("toast"); t.textContent=msg; t.classList.add("show");
+    clearTimeout(t._h); t._h=setTimeout(function(){t.classList.remove("show")},2600);
+  }
+  function bubbleLabel(idx){
+    var start=parseInt($("startNum").value,10); if(isNaN(start)||start<1) start=1;
+    return ($("prefix").value||"") + (start+idx);
+  }
+  function bubbleSize(){ return parseInt($("bubbleSize").value,10)||34; }
+  function curStroke(){ return $("strokeColor").value||"#dc2626"; }
+  function curFill(){ return $("fillColor").value||"#ffffff"; }
+  function pctVal(id,def){ var v=parseInt($(id).value,10); if(isNaN(v)) v=def; return Math.min(100,Math.max(0,v))/100; }
+  function curStrokeOp(){ return pctVal("strokeOpacity",100); }
+  function curFillOp(){ return pctVal("fillOpacity",60); }
+  /* Gaya per bubble: garis (border, leader, angka) dan isi, masing-masing dengan opasitas sendiri */
+  function bStroke(b){ return b.stroke || b.color || curStroke(); }
+  function bStrokeOp(b){ return (typeof b.strokeOp==="number")? b.strokeOp : 1; }
+  function bFill(b){ return b.fill || "#ffffff"; }
+  function bFillOp(b){ return (typeof b.fillOp==="number")? b.fillOp : curFillOp(); }
+  function hexToRgbaCss(hex,a){
+    var h=hex.replace("#",""); if(h.length===3) h=h.split("").map(function(c){return c+c}).join("");
+    var n=parseInt(h,16);
+    return "rgba("+((n>>16)&255)+","+((n>>8)&255)+","+(n&255)+","+a+")";
+  }
+  /* Titik awal garis leader: di tepi lingkaran bubble, bukan di tengahnya */
+  function leaderStart(b,size,W,H,tx,ty){
+    var dx=(tx-b.x)*W, dy=(ty-b.y)*H;
+    var len=Math.hypot(dx,dy);
+    if(len<1) return {x:b.x,y:b.y};
+    var r=size/2+1;
+    return { x: b.x + (dx/len)*r/W, y: b.y + (dy/len)*r/H };
+  }
+  function cancelPending(remove){
+    if(state.pendingLeaderId==null) return;
+    var id=state.pendingLeaderId; state.pendingLeaderId=null; state.preview=null; state.pendingSnap=null;
+    if(remove){
+      state.bubbles=state.bubbles.filter(function(b){return b.id!==id});
+      if(state.selectedId===id) state.selectedId=null;
+    }
+  }
+
+  /* ---------- File loading ---------- */
+  function loadFile(file){
+    if(!file) return;
+    if(file.type!=="application/pdf" && !/\.pdf$/i.test(file.name)){ toast("File harus berformat PDF."); return; }
+    var reader=new FileReader();
+    reader.onload=function(){
+      var bytes=new Uint8Array(reader.result);
+      state.pdfBytes=bytes; state.fileName=file.name;
+      pdfjsLib.getDocument({data:bytes.slice()}).promise.then(function(doc){
+        state.pdfDoc=doc; state.numPages=doc.numPages; state.page=1;
+        state.bubbles=[]; state.selectedId=null; state.nextId=1;
+        state.undoStack=[]; state.redoStack=[]; state.pendingLeaderId=null; state.preview=null; state.pendingSnap=null;
+        dropzone.hidden=true; stage.hidden=false;
+        $("docName").textContent=file.name;
+        $("docMeta").textContent="• "+doc.numPages+" halaman";
+        $("prevPage").disabled=false; $("nextPage").disabled=false;
+        $("btnExport").disabled=false; $("btnExportTop").disabled=false;
+        fitToWidth(true);
+        updateAll();
+        toast("PDF terbuka. Klik pada drawing untuk memasang bubble pertama.");
+      }).catch(function(err){ console.error(err); toast("Gagal membuka PDF. Coba file lain."); });
+    };
+    reader.readAsArrayBuffer(file);
+  }
+  fileInput.addEventListener("change",function(){ loadFile(fileInput.files[0]); fileInput.value=""; });
+  ["dragenter","dragover"].forEach(function(ev){ viewport.addEventListener(ev,function(e){ e.preventDefault(); dropzone.classList.add("drag"); }); });
+  ["dragleave","drop"].forEach(function(ev){ viewport.addEventListener(ev,function(e){ e.preventDefault(); dropzone.classList.remove("drag"); }); });
+  viewport.addEventListener("drop",function(e){ var f=e.dataTransfer && e.dataTransfer.files && e.dataTransfer.files[0]; if(f) loadFile(f); });
+
+  /* ---------- Rendering ---------- */
+  function fitToWidth(thenRender){
+    if(!state.pdfDoc) return;
+    state.pdfDoc.getPage(state.page).then(function(page){
+      var vp=page.getViewport({scale:1});
+      var avail=Math.max(320, viewport.clientWidth-36);
+      state.fitScale=avail/vp.width;
+      state.scale=state.fitScale;
+      updateZoomUI();
+      if(thenRender) renderPage();
+    });
+  }
+  function renderPage(){
+    if(!state.pdfDoc) return;
+    if(state.renderTask){ try{state.renderTask.cancel();}catch(e){} }
+    state.pdfDoc.getPage(state.page).then(function(page){
+      var dpr=window.devicePixelRatio||1;
+      var vp=page.getViewport({scale:state.scale});
+      canvas.width=Math.floor(vp.width*dpr); canvas.height=Math.floor(vp.height*dpr);
+      canvas.style.width=Math.floor(vp.width)+"px"; canvas.style.height=Math.floor(vp.height)+"px";
+      if(state.pendingAnchor){
+        var pa=state.pendingAnchor; state.pendingAnchor=null;
+        var nsr=stage.getBoundingClientRect();
+        viewport.scrollLeft += (nsr.left + pa.fx*nsr.width) - pa.ax;
+        viewport.scrollTop += (nsr.top + pa.fy*nsr.height) - pa.ay;
+      }
+      var transform=dpr!==1?[dpr,0,0,dpr,0,0]:null;
+      state.renderTask=page.render({canvasContext:ctx, viewport:vp, transform:transform});
+      state.renderTask.promise.catch(function(){});
+      $("pageLabel").textContent="Halaman "+state.page+" / "+state.numPages;
+      $("prevPage").disabled=state.page<=1; $("nextPage").disabled=state.page>=state.numPages;
+      drawBubbles();
+    });
+  }
+  $("prevPage").addEventListener("click",function(){ if(state.page>1){cancelPending(true); state.page--; state.selectedId=null; renderPage(); updateList();} });
+  $("nextPage").addEventListener("click",function(){ if(state.page<state.numPages){cancelPending(true); state.page++; state.selectedId=null; renderPage(); updateList();} });
+  $("zoomIn").addEventListener("click",function(){ setZoom(state.scale*1.25); });
+  $("zoomOut").addEventListener("click",function(){ setZoom(state.scale/1.25); });
+  $("zoomFit").addEventListener("click",function(){ fitToWidth(true); });
+  $("zfIn").addEventListener("click",function(){ setZoom(state.scale*1.25); });
+  $("zfOut").addEventListener("click",function(){ setZoom(state.scale/1.25); });
+  $("zfFit").addEventListener("click",function(){ fitToWidth(true); });
+  $("zfLabel").addEventListener("click",function(){ fitToWidth(true); });
+  $("zoomRange").addEventListener("input",function(){ if(state.pdfDoc) setZoom(state.fitScale*(parseInt(this.value,10)||100)/100); });
+  $("zoomPreset").addEventListener("change",function(){ if(this.value && state.pdfDoc) setZoom(state.fitScale*parseInt(this.value,10)/100); this.value=""; });
+  function updateZoomUI(){
+    var pct=state.fitScale>0? Math.round(state.scale/state.fitScale*100):100;
+    $("zoomLabel").textContent=pct+"%";
+    var zl=$("zfLabel"); if(zl) zl.textContent=pct+"%";
+    var zr=$("zoomRange"); if(zr) zr.value=Math.min(400,Math.max(25,pct));
+  }
+  function setZoom(s,cx,cy,fx,fy){
+    if(!state.pdfDoc) return;
+    var minS=state.fitScale*0.25, maxS=Math.max(state.fitScale*6, minS);
+    var ns=Math.min(maxS,Math.max(minS,s));
+    if(Math.abs(ns-state.scale)<0.0005){ updateZoomUI(); return; }
+    var vr=viewport.getBoundingClientRect();
+    var sr=stage.getBoundingClientRect();
+    var ax=(typeof cx==="number")? cx : vr.left+vr.width/2;
+    var ay=(typeof cy==="number")? cy : vr.top+vr.height/2;
+    state.pendingAnchor={
+      fx:(typeof fx==="number")? fx : (sr.width? (ax-sr.left)/sr.width : 0.5),
+      fy:(typeof fy==="number")? fy : (sr.height? (ay-sr.top)/sr.height : 0.5),
+      ax:ax, ay:ay
+    };
+    state.scale=ns;
+    updateZoomUI();
+    renderPage();
+  }
+  /* Zoom dengan Ctrl/Cmd + roda mouse (termasuk pinch trackpad), berpusat di kursor */
+  viewport.addEventListener("wheel",function(e){
+    if(!state.pdfDoc) return;
+    if(e.ctrlKey||e.metaKey){
+      e.preventDefault();
+      setZoom(state.scale*Math.exp(-e.deltaY*0.002), e.clientX, e.clientY);
+    }
+  },{passive:false});
+  /* Zoom cubit dua jari pada drawing (pratinjau transform, diterapkan saat jari diangkat) */
+  var pinchPtrs=new Map(); var pinchStart=null;
+  stage.addEventListener("pointerdown",function(e){
+    pinchPtrs.set(e.pointerId,{x:e.clientX,y:e.clientY});
+    if(pinchPtrs.size===2 && state.pdfDoc){
+      if(state.gestureBubbleId!=null && Date.now()-state.gestureTime<1000){
+        var gid=state.gestureBubbleId;
+        pushHistory();
+        state.bubbles=state.bubbles.filter(function(b){return b.id!==gid;});
+        if(state.selectedId===gid) state.selectedId=null;
+        if(state.pendingLeaderId===gid){ state.pendingLeaderId=null; state.preview=null; }
+        state.gestureBubbleId=null;
+        drawBubbles(); updateList(false);
+      }
+      var pts=Array.from(pinchPtrs.values());
+      var sr=stage.getBoundingClientRect();
+      pinchStart={
+        dist:Math.hypot(pts[0].x-pts[1].x, pts[0].y-pts[1].y),
+        scale:state.scale, ratio:1,
+        ox:(pts[0].x+pts[1].x)/2 - sr.left, oy:(pts[0].y+pts[1].y)/2 - sr.top,
+        mx:(pts[0].x+pts[1].x)/2, my:(pts[0].y+pts[1].y)/2,
+        w:stage.offsetWidth||sr.width, h:stage.offsetHeight||sr.height
+      };
+      stage.style.transformOrigin=pinchStart.ox+"px "+pinchStart.oy+"px";
+      state.pinching=true;
+    }
+  },true);
+  stage.addEventListener("pointermove",function(e){
+    if(pinchPtrs.has(e.pointerId)) pinchPtrs.set(e.pointerId,{x:e.clientX,y:e.clientY});
+    if(state.pinching && pinchStart && pinchPtrs.size===2){
+      var pts=Array.from(pinchPtrs.values());
+      var d=Math.hypot(pts[0].x-pts[1].x, pts[0].y-pts[1].y);
+      if(pinchStart.dist>0){
+        var minR=(state.fitScale*0.25)/pinchStart.scale, maxR=(state.fitScale*6)/pinchStart.scale;
+        pinchStart.ratio=Math.min(maxR,Math.max(minR, d/pinchStart.dist));
+        pinchStart.mx=(pts[0].x+pts[1].x)/2; pinchStart.my=(pts[0].y+pts[1].y)/2;
+        stage.style.transform="scale("+pinchStart.ratio+")";
+      }
+    }
+  },true);
+  function endPinch(e){
+    pinchPtrs.delete(e.pointerId);
+    if(state.pinching && pinchPtrs.size<2 && pinchStart){
+      var target=pinchStart.scale*(pinchStart.ratio||1);
+      var fx=pinchStart.w? pinchStart.ox/pinchStart.w : 0.5;
+      var fy=pinchStart.h? pinchStart.oy/pinchStart.h : 0.5;
+      var mx=pinchStart.mx, my=pinchStart.my;
+      stage.style.transform=""; stage.style.transformOrigin="";
+      state.pinching=false; pinchStart=null;
+      setZoom(target, mx, my, fx, fy);
+    } else if(pinchPtrs.size<2){
+      stage.style.transform=""; stage.style.transformOrigin="";
+      state.pinching=false; pinchStart=null;
+    }
+  }
+  stage.addEventListener("pointerup",endPinch,true);
+  stage.addEventListener("pointercancel",endPinch,true);
+  window.addEventListener("pointerup",function(){ if(!state.pinching) state.gestureBubbleId=null; });
+  /* Klik ganda pada mode Geser: beralih pas lebar <-> 200% di titik yang diklik */
+  overlay.addEventListener("dblclick",function(e){
+    if(state.mode==="add" || !state.pdfDoc) return;
+    var target=(state.scale>state.fitScale*1.05)? state.fitScale : state.fitScale*2;
+    setZoom(target, e.clientX, e.clientY);
+  });
+  var resizeT; window.addEventListener("resize",function(){ clearTimeout(resizeT); resizeT=setTimeout(function(){ if(state.pdfDoc && Math.abs(state.scale-state.fitScale)<0.01) fitToWidth(true); },250); });
+
+  /* ---------- Bubbles on canvas ---------- */
+  function drawBubbles(){
+    overlay.innerHTML="";
+    var size=bubbleSize();
+    var W=overlay.clientWidth||1, H=overlay.clientHeight||1;
+    var svg=document.createElementNS("http://www.w3.org/2000/svg","svg");
+    svg.setAttribute("class","leader-svg");
+    overlay.appendChild(svg);
+    function addLine(b,x2,y2,dashed){
+      var p=leaderStart(b,size,W,H,x2,y2);
+      var ln=document.createElementNS("http://www.w3.org/2000/svg","line");
+      ln.setAttribute("x1",(p.x*100)+"%"); ln.setAttribute("y1",(p.y*100)+"%");
+      ln.setAttribute("x2",(x2*100)+"%"); ln.setAttribute("y2",(y2*100)+"%");
+      ln.setAttribute("stroke", bStroke(b));
+      ln.setAttribute("stroke-opacity", bStrokeOp(b));
+      ln.setAttribute("stroke-width","2");
+      ln.setAttribute("stroke-linecap","butt");
+      if(dashed) ln.setAttribute("stroke-dasharray","5 4");
+      ln.dataset.lineFor=b.id;
+      svg.appendChild(ln);
+    }
+    state.bubbles.forEach(function(b,idx){
+      if(b.page!==state.page) return;
+      var col=bStroke(b); var sOp=bStrokeOp(b); var fCol=bFill(b); var fOp=bFillOp(b);
+      var isPending=state.pendingLeaderId===b.id;
+      if(typeof b.tx==="number" && typeof b.ty==="number"){
+        addLine(b,b.tx,b.ty,false);
+        var dot=document.createElement("div");
+        dot.className="leader-dot";
+        dot.style.left=(b.tx*100)+"%"; dot.style.top=(b.ty*100)+"%";
+        dot.style.setProperty("--bc", col);
+        dot.title="Ujung garis leader — seret untuk memindah titik tunjuk (garis saja, tanpa bulatan)";
+        dot.dataset.dotFor=b.id;
+        attachDotDrag(dot,b);
+        overlay.appendChild(dot);
+      } else if(isPending && state.preview){
+        addLine(b,state.preview.x,state.preview.y,true);
+      }
+      var el=document.createElement("div");
+      el.className="bubble"+(b.id===state.selectedId?" selected":"")+(isPending?" pending":"");
+      el.style.left=(b.x*100)+"%"; el.style.top=(b.y*100)+"%";
+      el.style.width=size+"px"; el.style.height=size+"px";
+      el.style.setProperty("--bc", col);
+      el.style.borderColor=hexToRgbaCss(col, sOp);
+      el.style.background=(b.id===state.selectedId)
+        ? hexToRgbaCss(col, Math.max(fOp,0.8))
+        : hexToRgbaCss(fCol, fOp);
+      if(b.id!==state.selectedId) el.style.color=hexToRgbaCss(col, sOp);
+      el.style.fontSize=(bubbleLabel(idx).length>2? Math.max(6,size*0.34) : Math.max(6,size*0.44))+"px";
+      el.dataset.id=b.id;
+      var num=document.createElement("span"); num.className="num"; num.textContent=bubbleLabel(idx);
+      el.appendChild(num);
+      attachDrag(el,b);
+      overlay.appendChild(el);
+    });
+    updateStats();
+  }
+  function refreshLine(b){
+    var line=overlay.querySelector('line[data-line-for="'+b.id+'"]');
+    if(!line) return;
+    var tx=(typeof b.tx==="number")? b.tx : (state.preview? state.preview.x : b.x);
+    var ty=(typeof b.ty==="number")? b.ty : (state.preview? state.preview.y : b.y);
+    var rect=overlay.getBoundingClientRect();
+    var p=leaderStart(b,bubbleSize(),rect.width||1,rect.height||1,tx,ty);
+    line.setAttribute("x1",(p.x*100)+"%"); line.setAttribute("y1",(p.y*100)+"%");
+    line.setAttribute("x2",(tx*100)+"%"); line.setAttribute("y2",(ty*100)+"%");
+  }
+  function attachDotDrag(dot,b){
+    dot.addEventListener("pointerdown",function(e){
+      e.preventDefault(); e.stopPropagation();
+      selectBubble(b.id,false);
+      var rect=overlay.getBoundingClientRect();
+      var startX=e.clientX, startY=e.clientY, origX=b.tx, origY=b.ty, snap=snapshotState(), moved=false;
+      dot.setPointerCapture(e.pointerId);
+      function mv(ev){
+        if(Math.abs(ev.clientX-startX)+Math.abs(ev.clientY-startY)>3) moved=true;
+        b.tx=Math.min(0.995,Math.max(0.005,origX+(ev.clientX-startX)/rect.width));
+        b.ty=Math.min(0.995,Math.max(0.005,origY+(ev.clientY-startY)/rect.height));
+        dot.style.left=(b.tx*100)+"%"; dot.style.top=(b.ty*100)+"%";
+        refreshLine(b);
+      }
+      function up(){ dot.removeEventListener("pointermove",mv); dot.removeEventListener("pointerup",up); if(moved) pushHistory(snap); }
+      dot.addEventListener("pointermove",mv); dot.addEventListener("pointerup",up);
+    });
+    dot.addEventListener("click",function(e){ e.stopPropagation(); });
+  }
+  function attachDrag(el,b){
+    el.addEventListener("pointerdown",function(e){
+      e.preventDefault(); e.stopPropagation();
+      selectBubble(b.id,false);
+      var rect=overlay.getBoundingClientRect();
+      var startX=e.clientX, startY=e.clientY, origX=b.x, origY=b.y, moved=false, snap=snapshotState();
+      el.setPointerCapture(e.pointerId);
+      function mv(ev){
+        var dx=(ev.clientX-startX)/rect.width, dy=(ev.clientY-startY)/rect.height;
+        if(Math.abs(ev.clientX-startX)+Math.abs(ev.clientY-startY)>3) moved=true;
+        b.x=Math.min(0.995,Math.max(0.005,origX+dx));
+        b.y=Math.min(0.995,Math.max(0.005,origY+dy));
+        el.style.left=(b.x*100)+"%"; el.style.top=(b.y*100)+"%";
+        refreshLine(b);
+      }
+      function up(ev){
+        el.removeEventListener("pointermove",mv); el.removeEventListener("pointerup",up);
+        if(moved){ pushHistory(snap); updateStats(); }
+      }
+      el.addEventListener("pointermove",mv); el.addEventListener("pointerup",up);
+    });
+    el.addEventListener("click",function(e){ e.stopPropagation(); });
+  }
+  overlay.addEventListener("pointerdown",function(e){
+    if(e.target!==overlay) return;
+    if(!state.pdfDoc) return;
+    if(state.mode!=="add" || e.button===1){
+      /* Seret area kosong untuk menggeser tampilan (pan); klik tanpa geser membatalkan pilihan */
+      var sx=e.clientX, sy=e.clientY, sl=viewport.scrollLeft, st=viewport.scrollTop, panned=false;
+      viewport.classList.add("panning");
+      function mv(ev){
+        var dx=ev.clientX-sx, dy=ev.clientY-sy;
+        if(Math.abs(dx)+Math.abs(dy)>4) panned=true;
+        if(panned){ viewport.scrollLeft=sl-dx; viewport.scrollTop=st-dy; }
+      }
+      function up(){
+        window.removeEventListener("pointermove",mv); window.removeEventListener("pointerup",up);
+        viewport.classList.remove("panning");
+        if(!panned && state.mode!=="add"){ state.selectedId=null; drawBubbles(); updateList(); }
+      }
+      window.addEventListener("pointermove",mv); window.addEventListener("pointerup",up);
+      return;
+    }
+    var rect=overlay.getBoundingClientRect();
+    var x=(e.clientX-rect.left)/rect.width, y=(e.clientY-rect.top)/rect.height;
+    /* Klik ke-2 pada mode leader: kunci titik tunjuk, garis selesai */
+    if(state.pendingLeaderId!=null){
+      var pb=state.bubbles.find(function(z){return z.id===state.pendingLeaderId});
+      state.pendingLeaderId=null; state.preview=null;
+      if(pb){
+        if(state.pendingSnap){ pushHistory(state.pendingSnap); state.pendingSnap=null; }
+        pb.tx=x; pb.ty=y; state.selectedId=pb.id; updateAll(); toast("Leader selesai — garis lurus saja dari bubble ke titik tunjuk. Ujung garis bisa diseret untuk koreksi.");
+      } else { state.pendingSnap=null; }
+      return;
+    }
+    if(state.placeType==="leader"){ state.pendingSnap=snapshotState(); } else { pushHistory(); }
+    var b={ id:state.nextId++, page:state.page, x:x, y:y, stroke:curStroke(), strokeOp:curStrokeOp(), fill:curFill(), fillOp:curFillOp(), tx:null, ty:null };
+    state.bubbles.push(b);
+    state.gestureBubbleId=b.id; state.gestureTime=Date.now();
+    state.selectedId=b.id;
+    if(state.placeType==="leader"){
+      state.pendingLeaderId=b.id; state.preview={x:x,y:y};
+      updateAll();
+      toast("Klik ke-1: posisi bubble terpasang. Sekarang klik ke-2 pada titik yang ditunjuk garis.");
+    } else {
+      updateAll();
+    }
+  });
+  /* Pratinjau garis leader mengikuti kursor/jari sebelum klik ke-2 */
+  overlay.addEventListener("pointermove",function(e){
+    if(state.pendingLeaderId==null) return;
+    var rect=overlay.getBoundingClientRect();
+    state.preview={ x:(e.clientX-rect.left)/rect.width, y:(e.clientY-rect.top)/rect.height };
+    var pb=state.bubbles.find(function(z){return z.id===state.pendingLeaderId});
+    if(pb) refreshLine(pb);
+  });
+
+  function selectBubble(id,scroll){
+    state.selectedId=id;
+    var b=state.bubbles.find(function(x){return x.id===id});
+    if(b && b.page!==state.page){ state.page=b.page; renderPage(); }
+    drawBubbles(); updateList(scroll);
+  }
+
+  /* ---------- Sidebar list ---------- */
+  function updateList(scrollToSelected){
+    var list=$("bubbleList"); list.innerHTML="";
+    if(!state.bubbles.length){
+      list.innerHTML='<div class="empty">Belum ada bubble.<br/>Upload PDF, lalu klik pada drawing untuk menambah.</div>';
+    }
+    state.bubbles.forEach(function(b,idx){
+      var item=document.createElement("div");
+      item.className="item"+(b.id===state.selectedId?" selected":""); item.dataset.id=b.id;
+      item.innerHTML=
+        '<div class="item-head" style="margin-bottom:0">'+
+          '<div class="badge" style="--bc:'+bStroke(b)+';background:'+hexToRgbaCss(bFill(b), bFillOp(b))+'">'+bubbleLabel(idx)+'</div>'+
+          '<div class="meta"><b>Bubble '+bubbleLabel(idx)+'</b><br/>Halaman '+b.page+((typeof b.tx==="number")?' • Leader (garis)':'')+'</div>'+
+          '<div class="iconbtns">'+
+            '<button type="button" data-act="up" title="Naikkan urutan" '+(idx===0?"disabled":"")+'>↑</button>'+
+            '<button type="button" data-act="down" title="Turunkan urutan" '+(idx===state.bubbles.length-1?"disabled":"")+'>↓</button>'+
+            '<button type="button" data-act="goto" title="Ke halaman bubble ini">◎</button>'+
+            '<button type="button" data-act="del" title="Hapus bubble">✕</button>'+
+          '</div>'+
+        '</div>';
+      item.addEventListener("click",function(e){ if(e.target.closest("button")) return; selectBubble(b.id,false); });
+      item.querySelectorAll("[data-act]").forEach(function(btn){
+        btn.addEventListener("click",function(){
+          var act=btn.dataset.act;
+          if(act==="del"){ removeBubble(b.id); }
+          else if(act==="up" && idx>0){ pushHistory(); var t=state.bubbles[idx-1]; state.bubbles[idx-1]=b; state.bubbles[idx]=t; updateAll(); }
+          else if(act==="down" && idx<state.bubbles.length-1){ pushHistory(); var t2=state.bubbles[idx+1]; state.bubbles[idx+1]=b; state.bubbles[idx]=t2; updateAll(); }
+          else if(act==="goto"){ selectBubble(b.id,true); }
+        });
+      });
+      list.appendChild(item);
+      if(scrollToSelected && b.id===state.selectedId){ setTimeout(function(){ item.scrollIntoView({block:"nearest",behavior:"smooth"}); },50); }
+    });
+    updateStats(); updateActionStates();
+  }
+
+  function removeBubble(id){
+    var i=state.bubbles.findIndex(function(b){return b.id===id});
+    if(i<0) return;
+    pushHistory();
+    if(state.pendingLeaderId===id){ state.pendingLeaderId=null; state.preview=null; state.pendingSnap=null; }
+    state.bubbles.splice(i,1);
+    if(state.selectedId===id) state.selectedId=null;
+    updateAll();
+    toast("Bubble dihapus — nomor lain menyesuaikan otomatis.");
+  }
+  function updateStats(){
+    $("statBubbles").textContent=state.bubbles.length;
+    $("statPages").textContent=state.numPages||"–";
+    $("statOnPage").textContent=state.bubbles.filter(function(b){return b.page===state.page}).length;
+  }
+  function updateActionStates(){
+    var has=state.bubbles.length>0;
+    $("btnUndo").disabled=!(state.undoStack.length>0 || state.pendingLeaderId!=null);
+    var rb=$("btnRedo"); if(rb) rb.disabled=!(state.redoStack.length>0);
+    $("btnClear").disabled=!has;
+    var canExport=!!state.pdfDoc;
+    $("btnExport").disabled=!canExport; $("btnExportTop").disabled=!canExport; $("btnExportFile").disabled=!canExport;
+  }
+  function updateAll(){ drawBubbles(); updateList(true); }
+
+  $("btnUndo").addEventListener("click",undoHistory);
+  $("btnRedo").addEventListener("click",redoHistory);
+  $("btnClear").addEventListener("click",function(){
+    if(!state.bubbles.length) return;
+    pushHistory();
+    state.bubbles=[]; state.selectedId=null; state.pendingLeaderId=null; state.preview=null; state.pendingSnap=null; updateAll(); toast("Semua bubble dihapus. Tekan Ctrl+Z untuk mengembalikan.");
+  });
+  document.addEventListener("keydown",function(e){
+    var inField=/INPUT|TEXTAREA|SELECT/.test(document.activeElement.tagName);
+    /* Ctrl+Z urungkan, Ctrl+Shift+Z / Ctrl+Y ulangi — di luar kolom isian agar undo teks bawaan tetap jalan di sana */
+    if((e.ctrlKey||e.metaKey) && !inField && !e.altKey && (e.key==="z"||e.key==="Z")){
+      e.preventDefault();
+      if(e.shiftKey) redoHistory(); else undoHistory();
+      return;
+    }
+    if((e.ctrlKey||e.metaKey) && !inField && !e.altKey && (e.key==="y"||e.key==="Y")){
+      e.preventDefault(); redoHistory(); return;
+    }
+    if((e.ctrlKey||e.metaKey) && state.pdfDoc && !inField && (e.key==="+"||e.key==="=")){ e.preventDefault(); setZoom(state.scale*1.2); return; }
+    if((e.ctrlKey||e.metaKey) && state.pdfDoc && !inField && e.key==="-"){ e.preventDefault(); setZoom(state.scale/1.2); return; }
+    if((e.ctrlKey||e.metaKey) && state.pdfDoc && !inField && e.key==="0"){ e.preventDefault(); fitToWidth(true); return; }
+    if(e.key==="Escape" && state.pendingLeaderId!=null){ cancelPending(true); updateAll(); toast("Leader dibatalkan — bubble klik ke-1 dihapus."); return; }
+    if((e.key==="Delete"||e.key==="Backspace") && state.selectedId && !/INPUT|TEXTAREA|SELECT/.test(document.activeElement.tagName)){
+      removeBubble(state.selectedId);
+    }
+    if(e.key==="ArrowRight" && state.pdfDoc && !/INPUT|TEXTAREA/.test(document.activeElement.tagName) && state.page<state.numPages){ state.page++; renderPage(); }
+    if(e.key==="ArrowLeft" && state.pdfDoc && !/INPUT|TEXTAREA/.test(document.activeElement.tagName) && state.page>1){ state.page--; renderPage(); }
+  });
+
+  /* ---------- Toolbar controls ---------- */
+  function setMode(m){
+    if(m!=="add" && state.pendingLeaderId!=null){ cancelPending(true); }
+    state.mode=m;
+    $("modeAdd").classList.toggle("active",m==="add");
+    $("modeMove").classList.toggle("active",m==="move");
+    overlay.classList.toggle("add-mode",m==="add");
+    if(m!=="add") drawBubbles();
+  }
+  $("modeAdd").addEventListener("click",function(){ setMode("add"); });
+  $("modeMove").addEventListener("click",function(){ setMode("move"); });
+  function setPlaceType(t){
+    state.placeType=t;
+    $("placePlain").classList.toggle("active",t==="plain");
+    $("placeLeader").classList.toggle("active",t==="leader");
+    if(t==="plain" && state.pendingLeaderId!=null){ cancelPending(true); drawBubbles(); updateList(false); }
+  }
+  $("placePlain").addEventListener("click",function(){ setPlaceType("plain"); });
+  $("placeLeader").addEventListener("click",function(){ setPlaceType("leader"); toast("Mode leader aktif: klik 1 = posisi bubble, klik 2 = titik tunjuk. Garis saja, tanpa panah."); });
+  $("bubbleSize").addEventListener("input",function(){ $("sizeVal").textContent=bubbleSize(); drawBubbles(); });
+  /* Gaya Markup (tab Markup): warna & opasitas garis dan isi. Menjadi bawaan bubble
+     baru; bila ada bubble terpilih, perubahan langsung diterapkan ke bubble itu
+     dan tercatat sebagai satu langkah riwayat (Ctrl+Z) saat kontrol dilepas. */
+  var styleSnap=null;
+  function styleBegin(){ if(styleSnap===null) styleSnap=snapshotState(); }
+  function styleCommit(){ if(styleSnap!==null){ if(state.selectedId!=null) pushHistory(styleSnap); styleSnap=null; } }
+  function applyStyleToSelected(){
+    var b=state.bubbles.find(function(x){return x.id===state.selectedId});
+    if(!b) return;
+    b.stroke=curStroke(); b.strokeOp=curStrokeOp(); b.fill=curFill(); b.fillOp=curFillOp();
+    drawBubbles(); updateList(false);
+  }
+  function syncStyleLabels(){
+    $("strokeOpacityVal").textContent=Math.round(curStrokeOp()*100);
+    $("fillOpacityVal").textContent=Math.round(curFillOp()*100);
+  }
+  ["strokeColor","fillColor","strokeOpacity","fillOpacity"].forEach(function(id){
+    var el=$(id);
+    el.addEventListener("pointerdown",styleBegin);
+    el.addEventListener("focus",styleBegin);
+    el.addEventListener("input",function(){ syncStyleLabels(); applyStyleToSelected(); });
+    el.addEventListener("change",styleCommit);
+  });
+  document.querySelectorAll(".swatches button").forEach(function(btn){
+    btn.addEventListener("click",function(){
+      var wrap=btn.closest(".swatches"); var target=wrap? $(wrap.dataset.for) : null; if(!target) return;
+      styleBegin();
+      target.value=btn.dataset.color;
+      target.dispatchEvent(new Event("input"));
+      styleCommit();
+    });
+  });
+  /* Tab ribbon ala Word: Berkas / Beranda / Markup / Tampilan */
+  document.querySelectorAll(".tab").forEach(function(tab){
+    tab.addEventListener("click",function(){
+      document.querySelectorAll(".tab").forEach(function(t){ t.classList.toggle("active", t===tab); });
+      document.querySelectorAll(".ribbon-panel").forEach(function(p){ p.classList.toggle("active", p.dataset.panel===tab.dataset.tab); });
+    });
+  });
+  ["startNum","prefix"].forEach(function(id){ $(id).addEventListener("input",function(){ drawBubbles(); updateList(false); }); });
+  $("btnSampleInfo").addEventListener("click",function(){
+    toast("Alur: 1) Upload PDF  2) Klik drawing untuk bubble — atau pilih “Leader garis · 2 klik”: klik 1 posisi bubble, klik 2 titik tunjuk  3) Atur opasitas bila perlu  4) Export PDF");
+  });
+
+  /* ---------- Export ---------- */
+  function hexToRgb(hex){
+    var h=hex.replace("#",""); if(h.length===3) h=h.split("").map(function(c){return c+c}).join("");
+    var n=parseInt(h,16);
+    return PDFLib.rgb(((n>>16)&255)/255, ((n>>8)&255)/255, (n&255)/255);
+  }
+  async function exportPdf(){
+    if(!state.pdfDoc || !state.pdfBytes){ toast("Upload PDF dulu sebelum export."); return; }
+    var status=$("exportStatus"); status.textContent="Menyiapkan PDF…";
+    $("btnExport").disabled=true; $("btnExportTop").disabled=true; $("btnExportFile").disabled=true;
+    try{
+      var doc=await PDFLib.PDFDocument.load(state.pdfBytes.slice());
+      var pages=doc.getPages();
+      var fontBold=await doc.embedFont(PDFLib.StandardFonts.HelveticaBold);
+      var displaySize=bubbleSize();
+      /* Konversi layar → PDF: di layar, 1 pt PDF tampil sebesar state.scale px
+         dan bubble selalu tampil sebesar displaySize px. Radius bubble di PDF
+         = (displaySize/2) / state.scale pt — persis ukuran relatif yang terlihat
+         di layar saat export, di zoom mana pun, dan berubah penuh mengikuti
+         slider ukuran (tidak lagi dijepit ke rentang tetap). */
+      var scaleNow=(state.scale>0)? state.scale : ((state.fitScale>0)? state.fitScale : 1);
+      var lineW=Math.max(0.5, 2/scaleNow);      /* garis leader: 2px di layar */
+      var borderW=Math.max(0.6, 2.6/scaleNow);  /* border bubble: 2.6px di layar */
+
+      state.bubbles.forEach(function(b,idx){
+        var page=pages[b.page-1]; if(!page) return;
+        var size=page.getSize();
+        var r=(displaySize/2)/scaleNow;
+        r=Math.max(3, Math.min(r, Math.min(size.width,size.height)*0.45));
+        var cx=b.x*size.width, cy=size.height - b.y*size.height;
+        var col=hexToRgb(bStroke(b));
+        var sOp=bStrokeOp(b), fOp=bFillOp(b);
+        var fillCol=hexToRgb(bFill(b));
+        var isSel=(b.id===state.selectedId);
+        /* Garis leader (tanpa panah): dari tepi bubble ke titik tunjuk, digambar dulu agar di bawah lingkaran */
+        if(typeof b.tx==="number" && typeof b.ty==="number"){
+          var txp=b.tx*size.width, typ=size.height - b.ty*size.height;
+          var dxp=txp-cx, dyp=typ-cy, lenp=Math.hypot(dxp,dyp);
+          var sxp=cx, syp=cy;
+          if(lenp>1){ var off=r+1/scaleNow; sxp=cx+(dxp/lenp)*off; syp=cy+(dyp/lenp)*off; }
+          page.drawLine({start:{x:sxp,y:syp}, end:{x:txp,y:typ}, thickness:lineW, color:col, opacity:sOp});
+        }
+        /* Isi & angka mengikuti layar: bubble terpilih tampil berisi warna garis dengan angka putih */
+        page.drawCircle({x:cx,y:cy,size:r,
+          color: isSel? col : fillCol,
+          borderColor:col, borderWidth:borderW,
+          opacity: isSel? Math.max(fOp,0.8) : fOp, borderOpacity:sOp});
+        var label=bubbleLabel(idx);
+        var fs= label.length<=2 ? r*0.88 : r*0.68;
+        var tw=fontBold.widthOfTextAtSize(label,fs);
+        var maxTw=r*1.7;
+        if(tw>maxTw){ fs=fs*(maxTw/tw); tw=maxTw; }
+        page.drawText(label,{x:cx-tw/2,y:cy-fs*0.36,size:fs,font:fontBold,color: isSel? PDFLib.rgb(1,1,1) : col, opacity: isSel? 1 : sOp});
+      });
+
+      var out=await doc.save();
+      var blob=new Blob([out],{type:"application/pdf"});
+      var a=document.createElement("a");
+      var base=(state.fileName||"drawing").replace(/\.pdf$/i,"");
+      a.href=URL.createObjectURL(blob); a.download=base+"_bubble.pdf";
+      document.body.appendChild(a); a.click(); a.remove();
+      setTimeout(function(){ URL.revokeObjectURL(a.href); },4000);
+      status.textContent="Selesai — "+base+"_bubble.pdf terunduh ("+state.bubbles.length+" bubble).";
+      toast("PDF hasil bubble berhasil di-export.");
+    }catch(err){
+      console.error(err);
+      status.textContent="Export gagal: "+(err && err.message ? err.message : err);
+      toast("Export gagal. Coba lagi.");
+    }finally{
+      updateActionStates();
+    }
+  }
+  $("btnExport").addEventListener("click",exportPdf);
+  $("btnExportTop").addEventListener("click",exportPdf);
+  $("btnExportFile").addEventListener("click",exportPdf);
+
+  updateStats(); updateActionStates();
+})();
+</script>
+</body>
+</html>
